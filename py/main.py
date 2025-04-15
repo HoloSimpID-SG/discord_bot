@@ -3,23 +3,22 @@ import argparse
 import sys
 import discord_bot
 
+def main_help():
+	print('Incomplete command, run \'python run_bot.py -t <token> -n <server_name>\'')
+	sys.exit(1)
+
 def main(argc, argv):
 	parser = argparse.ArgumentParser(description=None)
 	parser.add_argument('-t', '--token', help='discord app token')
+	parser.add_argument('-n', '--name',  help='discord server name')
 
 	args = parser.parse_args()
 
-	token = None
-	if args.token == None:
-		print('No token received, run \'python run_bot.py -t <token>\'')
-		sys.exit(1)
-	else:
-		token = args.token
+	if ((args.token == None) and (args.name == None)):
+		main_help()
 
-	print(f"Token is: {token}")
-
-	bot = discord_bot.init()
-	bot.run(token)
+	bot = discord_bot.init(args.name)
+	bot.run(args.token)
 
 
 if __name__ == '__main__':

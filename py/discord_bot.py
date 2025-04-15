@@ -4,8 +4,12 @@
 import discord
 from discord.ext import commands
 import random
+from discord_server import DiscordServer
 
-def init():
+def init(name: str):
+
+	discordServer = DiscordServer(name, None, None)
+
 	description = '''An example bot to showcase the discord.ext.commands extension
 	module.
 
@@ -19,6 +23,9 @@ def init():
 
 	@bot.event
 	async def on_ready():
+		discordServer.guild			= discord.utils.get(bot.guilds, name=discordServer.name)
+		if discordServer.guild is not None:
+			discordServer.channel_cart	= discord.utils.get(discordServer.guild.text_channels, name='merchtalk')
 		print(f'Logged in as {bot.user} (ID: {bot.user.id})')
 		print('------')
 
@@ -76,9 +83,27 @@ def init():
 
 	@bot.command()
 	async def kys(ctx):
-		"""Kill the disccord bot"""
+		"""Kill the discord bot"""
 		await ctx.send('```\nあ、死んだ\n世界は酷い\nさよならー\n```')
 		quit()
+
+	@bot.command()
+	async def guild_info(ctx):
+		"""Get Guild Information"""
+		if discordServer.guild is not None:
+			members = ''
+			async for member in discordServer.guild.fetch_members(limit=50):
+				members = f'{members}\n{member.name}'
+			await ctx.send(f'```\nGuild name   : {discordServer.guild.name}\nGuild members: {members}\n```')
+
+	@bot.command()
+	async def cart(ctx, command: str, argument: str):
+		"""Usage: ?cart <command> <argument>"""
+		if discordServer.channel_cart is not None:
+			if discordServer.channel_cart == ctx.channel:
+				await ctx.send("Cart command invoked!")
+			else:
+				await ctx.message.reply('Please invoke cart command at #merchtalk!', mention_author=True)
 
 	@bot.group()
 	async def cool(ctx):
